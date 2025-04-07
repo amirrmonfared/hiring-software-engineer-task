@@ -130,7 +130,7 @@ paths:
   /api/v1/ads:
     get:
       summary: Get winning ads for a placement
-      description: Returns the winning ads for a specific placement with optional filters (TO BE IMPLEMENTED BY CANDIDATE)
+      description: Returns the winning ads for a specific placement with optional category/keyword filters
       operationId: getWinningAds
       parameters:
         - name: placement
@@ -184,7 +184,7 @@ paths:
   /api/v1/tracking:
     post:
       summary: Record ad interaction
-      description: Records user interactions with ads (TO BE IMPLEMENTED BY CANDIDATE)
+      description: Records user interactions with ads (impression, click, conversion)
       operationId: trackAdInteraction
       requestBody:
         required: true

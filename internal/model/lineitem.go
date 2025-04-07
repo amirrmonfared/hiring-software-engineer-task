@@ -30,11 +30,11 @@ type LineItem struct {
 
 // LineItemCreate represents the data needed to create a new line item
 type LineItemCreate struct {
-	Name         string   `json:"name"`
-	AdvertiserID string   `json:"advertiser_id"`
-	Bid          float64  `json:"bid"`
-	Budget       float64  `json:"budget"`
-	Placement    string   `json:"placement"`
+	Name         string   `json:"name" validate:"required"`
+	AdvertiserID string   `json:"advertiser_id" validate:"required"`
+	Bid          float64  `json:"bid" validate:"gte=0"`
+	Budget       float64  `json:"budget" validate:"gte=0"`
+	Placement    string   `json:"placement" validate:"required"`
 	Categories   []string `json:"categories,omitempty"`
 	Keywords     []string `json:"keywords,omitempty"`
 }
@@ -60,8 +60,8 @@ const (
 
 // TrackingEvent represents a user interaction with an ad
 type TrackingEvent struct {
-	EventType  TrackingEventType `json:"event_type"`
-	LineItemID string            `json:"line_item_id"`
+	EventType  TrackingEventType `json:"event_type" validate:"required,oneof=impression click conversion"`
+	LineItemID string            `json:"line_item_id" validate:"required"`
 	Timestamp  time.Time         `json:"timestamp,omitempty"`
 	Placement  string            `json:"placement,omitempty"`
 	UserID     string            `json:"user_id,omitempty"`

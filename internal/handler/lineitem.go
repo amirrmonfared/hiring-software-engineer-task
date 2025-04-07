@@ -2,24 +2,26 @@ package handler
 
 import (
 	"sweng-task/internal/model"
-
 	"sweng-task/internal/service"
 
+	"github.com/go-playground/validator/v10"
 	fiber "github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
 
 // LineItemHandler handles HTTP requests related to line items
 type LineItemHandler struct {
-	service *service.LineItemService
-	log     *zap.SugaredLogger
+	service  *service.LineItemService
+	log      *zap.SugaredLogger
+	validate *validator.Validate
 }
 
 // NewLineItemHandler creates a new LineItemHandler
 func NewLineItemHandler(service *service.LineItemService, log *zap.SugaredLogger) *LineItemHandler {
 	return &LineItemHandler{
-		service: service,
-		log:     log,
+		service:  service,
+		log:      log,
+		validate: validator.New(),
 	}
 }
 
@@ -34,10 +36,17 @@ func (h *LineItemHandler) Create(c *fiber.Ctx) error {
 		})
 	}
 
-	// Note: Validation logic should be implemented by the candidate
+	if err := h.validate.Struct(input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
+			"message": "Validation failed",
+			"details": err.Error(),
+		})
+	}
 
 	lineItem, err := h.service.Create(input)
 	if err != nil {
+		h.log.Errorw("Failed to create line item", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"code":    fiber.StatusInternalServerError,
 			"message": "Failed to create line item",
@@ -66,6 +75,7 @@ func (h *LineItemHandler) GetByID(c *fiber.Ctx) error {
 				"message": "Line item not found",
 			})
 		}
+		h.log.Errorw("Failed to retrieve line item", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"code":    fiber.StatusInternalServerError,
 			"message": "Failed to retrieve line item",
@@ -83,6 +93,7 @@ func (h *LineItemHandler) GetAll(c *fiber.Ctx) error {
 
 	lineItems, err := h.service.GetAll(advertiserID, placement)
 	if err != nil {
+		h.log.Errorw("Failed to retrieve line items", "error", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"code":    fiber.StatusInternalServerError,
 			"message": "Failed to retrieve line items",
