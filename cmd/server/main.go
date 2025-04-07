@@ -10,7 +10,7 @@ import (
 	"sweng-task/internal/handler"
 	"sweng-task/internal/service"
 
-	"github.com/gofiber/fiber/v2"
+	fiber "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -24,7 +24,11 @@ func main() {
 		fmt.Printf("Error initializing logger: %v\n", err)
 		os.Exit(1)
 	}
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			fmt.Printf("Error syncing logger: %v\n", err)
+		}
+	}()
 	log := logger.Sugar()
 
 	// Load configuration

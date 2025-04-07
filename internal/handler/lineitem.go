@@ -5,7 +5,7 @@ import (
 
 	"sweng-task/internal/service"
 
-	"github.com/gofiber/fiber/v2"
+	fiber "github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
 
